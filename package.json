@@ -1,0 +1,36 @@
+{
+  "name": "fishbowl-js",
+  "version": "1.0.0",
+  "description": "A JavaScript wrapper for the Fishbowl API",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc",
+    "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
+    "lint": "tslint -p tsconfig.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BrennenRocks/fishbowl-js.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/BrennenRocks/fishbowl-js/issues"
+  },
+  "homepage": "https://github.com/BrennenRocks/fishbowl-js#readme",
+  "files": [
+    "lib/**/*"
+  ],
+  "devDependencies": {
+    "@types/node": "^10.12.24",
+    "prettier": "^1.16.4",
+    "tslint": "^5.12.1",
+    "tslint-config-prettier": "^1.18.0",
+    "typescript": "^3.3.3"
+  },
+  "dependencies": {
+    "winston": "^3.2.1"
+  }
+}
