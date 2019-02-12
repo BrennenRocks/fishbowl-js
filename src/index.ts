@@ -12,7 +12,7 @@ interface ConstructorOptions {
   password?: string;
 }
 
-export default class Fishbowl {
+export = class Fishbowl {
   private key = '';
   private userId = '';
 
@@ -191,7 +191,7 @@ export default class Fishbowl {
       }
 
       if (resData.length === resLength) {
-        const resJson = resData.toString('utf8');
+        const resJson = JSON.parse(resData.toString('utf8'));
         resLength = undefined;
 
         // Inactivity check from server

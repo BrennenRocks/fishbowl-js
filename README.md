@@ -1,1 +1,3 @@
-# Fishbowljs
+# Fishbowl-js
+
+Beta version
