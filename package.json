@@ -1,6 +1,6 @@
 {
   "name": "fishbowl-js",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A JavaScript wrapper for the Fishbowl API",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -18,7 +18,15 @@
     "type": "git",
     "url": "git+https://github.com/BrennenRocks/fishbowl-js.git"
   },
-  "keywords": ["fishbowl", "inventory", "fishbowljs", "js-fishbowl", "node-fishbowl", "fishbowlnode", "plugin"],
+  "keywords": [
+    "fishbowl",
+    "inventory",
+    "fishbowljs",
+    "js-fishbowl",
+    "node-fishbowl",
+    "fishbowlnode",
+    "plugin"
+  ],
   "author": "Brennen Davis",
   "license": "ISC",
   "bugs": {

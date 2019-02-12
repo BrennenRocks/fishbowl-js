@@ -242,4 +242,4 @@ export = class Fishbowl {
       }
     });
   };
-}
+};
