@@ -1,8 +1,16 @@
-/// <reference path="./index.d.ts" />
-
 import * as crypto from 'crypto';
 import * as net from 'net';
 import * as winston from 'winston';
+
+interface ConstructorOptions {
+  host?: string;
+  port?: number;
+  IAID?: number;
+  IAName?: string;
+  IADescription?: string;
+  username?: string;
+  password?: string;
+}
 
 export default class Fishbowl {
   private key = '';
@@ -42,7 +50,7 @@ export default class Fishbowl {
     IADescription = 'Fishbowljs helper',
     username = 'admin',
     password = 'admin'
-  }: constructorOptions) {
+  }: ConstructorOptions) {
     this.host = host;
     this.port = port;
     this.IAID = IAID;
@@ -123,7 +131,7 @@ export default class Fishbowl {
       if (fbData === 'LoginRs') {
         return cb(null, data);
       } else if (fbData === 'ExecuteQueryRs') {
-        // TODO: parse response
+        // TODO: parse query response
       } else {
         return cb(null, data.FbiJson.FbiMsgsRs[fbData]);
       }

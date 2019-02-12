@@ -2,19 +2,24 @@
   "name": "fishbowl-js",
   "version": "1.0.0",
   "description": "A JavaScript wrapper for the Fishbowl API",
-  "main": "index.js",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
     "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
-    "lint": "tslint -p tsconfig.json"
+    "lint": "tslint -p tsconfig.json",
+    "prepare": "npm run build",
+    "prepublishOnly": "npm run lint",
+    "preversion": "npm run lint",
+    "version": "npm run format && git add -A src",
+    "postversion": "git push && git push --tags"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/BrennenRocks/fishbowl-js.git"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["fishbowl", "inventory", "fishbowljs", "js-fishbowl", "node-fishbowl", "fishbowlnode", "plugin"],
+  "author": "Brennen Davis",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/BrennenRocks/fishbowl-js/issues"
