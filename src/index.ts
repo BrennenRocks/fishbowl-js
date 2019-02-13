@@ -15,8 +15,8 @@ interface ConstructorOptions {
 }
 
 interface Error {
-  code: number,
-  message: string
+  code: number;
+  message: string;
 }
 
 export = class Fishbowl {
@@ -79,7 +79,7 @@ export = class Fishbowl {
       level: 'info',
       format: winston.format.json(),
       transports: [
-        new winston.transports.File({ 
+        new winston.transports.File({
           level: 'error',
           filename: 'error.log',
           format: winston.format.combine(
@@ -89,7 +89,7 @@ export = class Fishbowl {
             winston.format.json()
           )
         }),
-        new winston.transports.File({ 
+        new winston.transports.File({
           filename: 'combined.log',
           format: winston.format.combine(
             winston.format.timestamp({
@@ -143,14 +143,24 @@ export = class Fishbowl {
       if (err) {
         return cb(err, null);
       }
-      
+
       const fbData = Object.keys(data.FbiJson.FbiMsgsRs)[1];
       if (data.FbiJson.FbiMsgsRs.statusCode !== 1000) {
-        const fbError: Error = {code: data.FbiJson.FbiMsgsRs.statusCode, message: data.FbiJson.FbiMsgsRs.statusMessage || this.errorCodes[data.FbiJson.FbiMsgsRs.statusCode]};
+        const fbError: Error = {
+          code: data.FbiJson.FbiMsgsRs.statusCode,
+          message:
+            data.FbiJson.FbiMsgsRs.statusMessage ||
+            this.errorCodes[data.FbiJson.FbiMsgsRs.statusCode]
+        };
         this.logger.error(fbError);
         cb(fbError, null);
       } else if (data.FbiJson.FbiMsgsRs[fbData].statusCode !== 1000) {
-        const fbError: Error = {code: data.FbiJson.FbiMsgsRs[fbData].statusCode, message: data.FbiJson.FbiMsgsRs[fbData].statusMessage || this.errorCodes[data.FbiJson.FbiMsgsRs[fbData].statusCode] };
+        const fbError: Error = {
+          code: data.FbiJson.FbiMsgsRs[fbData].statusCode,
+          message:
+            data.FbiJson.FbiMsgsRs[fbData].statusMessage ||
+            this.errorCodes[data.FbiJson.FbiMsgsRs[fbData].statusCode]
+        };
         this.logger.error(fbError);
         cb(fbError, null);
       } else {
@@ -160,7 +170,7 @@ export = class Fishbowl {
         } else if (fbData === 'ExecuteQueryRs') {
           // TODO: parse query response
         }
-        
+
         cb(null, data.FbiJson.FbiMsgsRs[fbData]);
       }
 
@@ -240,10 +250,14 @@ export = class Fishbowl {
   };
 
   private loginToFishbowl = (): void => {
-    this.sendRequest('LoginRq', {username: this.username, password: this.password}, (err, res) => {
-      this.deque();
-    });
-  }
+    this.sendRequest(
+      'LoginRq',
+      { username: this.username, password: this.password },
+      (err, res) => {
+        this.deque();
+      }
+    );
+  };
 
   private loginRequest = (username: string, password: string): string => {
     return JSON.stringify({
