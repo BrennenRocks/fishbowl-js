@@ -1,6 +1,7 @@
-import * as crypto from 'crypto';
-import * as net from 'net';
-import * as winston from 'winston';
+import crypto from 'crypto';
+import net from 'net';
+import winston from 'winston';
+import errorCodes from './errorCodes.json';
 
 interface ConstructorOptions {
   host?: string;
@@ -8,15 +9,24 @@ interface ConstructorOptions {
   IAID?: number;
   IAName?: string;
   IADescription?: string;
+  username?: string;
+  password?: string;
+  autoLogin?: boolean;
+}
+
+interface Error {
+  code: number,
+  message: string
 }
 
 export = class Fishbowl {
+  private errorCodes: any;
   private key = '';
   private userId = '';
 
   private connection: net.Socket;
   private connected = false;
-  private waiting = false;
+  private waiting: boolean;
   private reqQueue: any[] = [];
 
   private host: string;
@@ -24,6 +34,10 @@ export = class Fishbowl {
   private IAID: number;
   private IAName: string;
   private IADescription: string;
+  private autoLogin: boolean;
+
+  private username: string;
+  private password: string;
 
   private logger: any;
 
@@ -34,27 +48,56 @@ export = class Fishbowl {
    * @param IADescription
    * @param IAID
    * @param IAName - Display name of Integrated App in Fishbowl
+   * @param username - Fishbowl username
+   * @param password - Fishbowl password
+   * @param autoLogin - Should the integration attempt to relogin when sending requests if disconnected
    */
   constructor({
     host = '127.0.0.1',
     port = 28192,
     IAID = 54321,
     IAName = 'Fishbowljs',
-    IADescription = 'Fishbowljs helper'
+    IADescription = 'Fishbowljs helper',
+    username = 'admin',
+    password = 'admin',
+    autoLogin = true
   }: ConstructorOptions) {
     this.host = host;
     this.port = port;
     this.IAID = IAID;
     this.IAName = IAName;
     this.IADescription = IADescription;
+    this.username = username;
+    this.password = password;
+    this.autoLogin = autoLogin;
     this.connection = new net.Socket();
+    this.errorCodes = errorCodes;
+
+    this.waiting = autoLogin;
 
     this.logger = winston.createLogger({
       level: 'info',
       format: winston.format.json(),
       transports: [
-        new winston.transports.File({ filename: 'error.log', level: 'error' }),
-        new winston.transports.File({ filename: 'combined.log' })
+        new winston.transports.File({ 
+          level: 'error',
+          filename: 'error.log',
+          format: winston.format.combine(
+            winston.format.timestamp({
+              format: 'YYYY-MM-DD hh:mm:ss A ZZ'
+            }),
+            winston.format.json()
+          )
+        }),
+        new winston.transports.File({ 
+          filename: 'combined.log',
+          format: winston.format.combine(
+            winston.format.timestamp({
+              format: 'YYYY-MM-DD hh:mm:ss A ZZ'
+            }),
+            winston.format.json()
+          )
+        })
       ]
     });
 
@@ -64,12 +107,12 @@ export = class Fishbowl {
   /**
    * @param req - The request you would like to make
    * @param options - The options for the specific request you are making
-   * @param cb - (err: string, res: string)
+   * @param cb - (err: Error | null, res: JSON)
    */
   public sendRequest = (
     req: string,
     options: any,
-    cb: (err: string | null, res: any) => void
+    cb: (err: Error | null, res: any) => void
   ): void => {
     if (this.waiting && !req.includes('LoginRq')) {
       this.reqQueue.push({ req, options, cb });
@@ -100,33 +143,28 @@ export = class Fishbowl {
       if (err) {
         return cb(err, null);
       }
-
-      // Check for connectivity errors with fishbowl server
-      if (data.FbiJson.FbiMsgsRs.statusCode !== 1000) {
-        const fbError = data.FbiJson.FbiMsgsRs.statusMessage;
-        this.logger.error(fbError);
-        return cb(fbError, null);
-      }
-
-      // Check for data error
+      
       const fbData = Object.keys(data.FbiJson.FbiMsgsRs)[1];
-      if (data.FbiJson.FbiMsgsRs[fbData].statusCode !== 1000) {
-        const fbError = data.FbiJson.FbiMsgsRs.statusMessage;
+      if (data.FbiJson.FbiMsgsRs.statusCode !== 1000) {
+        const fbError: Error = {code: data.FbiJson.FbiMsgsRs.statusCode, message: data.FbiJson.FbiMsgsRs.statusMessage || this.errorCodes[data.FbiJson.FbiMsgsRs.statusCode]};
         this.logger.error(fbError);
-        return cb(fbError, null);
-      }
-
-      if (fbData === 'LoginRs') {
-        return cb(null, data);
-      } else if (fbData === 'ExecuteQueryRs') {
-        // TODO: parse query response
+        cb(fbError, null);
+      } else if (data.FbiJson.FbiMsgsRs[fbData].statusCode !== 1000) {
+        const fbError: Error = {code: data.FbiJson.FbiMsgsRs[fbData].statusCode, message: data.FbiJson.FbiMsgsRs[fbData].statusMessage || this.errorCodes[data.FbiJson.FbiMsgsRs[fbData].statusCode] };
+        this.logger.error(fbError);
+        cb(fbError, null);
       } else {
-        return cb(null, data.FbiJson.FbiMsgsRs[fbData]);
+        if (fbData === 'LoginRs') {
+          this.key = data.FbiJson.Ticket.Key;
+          this.userId = data.FbiJson.Ticket.UserID;
+        } else if (fbData === 'ExecuteQueryRs') {
+          // TODO: parse query response
+        }
+        
+        cb(null, data.FbiJson.FbiMsgsRs[fbData]);
       }
 
-      if (!data.FbiJson.FbiMsgsRs.LoginRs) {
-        this.deque();
-      }
+      this.deque();
     });
 
     const reqLength = Buffer.alloc(4);
@@ -145,7 +183,11 @@ export = class Fishbowl {
     this.connection.connect(this.port, this.host, () => {
       this.connected = true;
       this.logger.info('Connected to Fishbowl...');
-      this.deque();
+      if (this.autoLogin) {
+        this.loginToFishbowl();
+      } else {
+        this.deque();
+      }
     });
 
     this.connection.on('close', () => {
@@ -177,7 +219,6 @@ export = class Fishbowl {
         // Inactivity check from server
         if (resJson.FbiJson.FbiMsgsRs.statusCode === 1010) {
           this.connected = false;
-          return;
         }
 
         this.connection.emit('done', null, resJson);
@@ -197,6 +238,12 @@ export = class Fishbowl {
       this.sendRequest(queuedReq.req, queuedReq.options, queuedReq.cb);
     }
   };
+
+  private loginToFishbowl = (): void => {
+    this.sendRequest('LoginRq', {username: this.username, password: this.password}, (err, res) => {
+      this.deque();
+    });
+  }
 
   private loginRequest = (username: string, password: string): string => {
     return JSON.stringify({
