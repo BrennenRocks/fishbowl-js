@@ -8,15 +8,13 @@ interface ConstructorOptions {
   IAID?: number;
   IAName?: string;
   IADescription?: string;
-  username?: string;
-  password?: string;
 }
 
 export = class Fishbowl {
   private key = '';
   private userId = '';
 
-  private connection = new net.Socket();
+  private connection: net.Socket;
   private connected = false;
   private waiting = false;
   private reqQueue: any[] = [];
@@ -27,9 +25,6 @@ export = class Fishbowl {
   private IAName: string;
   private IADescription: string;
 
-  private username: string;
-  private password: string;
-
   private logger: any;
 
   /**
@@ -39,25 +34,20 @@ export = class Fishbowl {
    * @param IADescription
    * @param IAID
    * @param IAName - Display name of Integrated App in Fishbowl
-   * @param username - Fishbowl username
-   * @param password - Fishbowl password
    */
   constructor({
     host = '127.0.0.1',
     port = 28192,
     IAID = 54321,
     IAName = 'Fishbowljs',
-    IADescription = 'Fishbowljs helper',
-    username = 'admin',
-    password = 'admin'
+    IADescription = 'Fishbowljs helper'
   }: ConstructorOptions) {
     this.host = host;
     this.port = port;
     this.IAID = IAID;
     this.IAName = IAName;
     this.IADescription = IADescription;
-    this.username = username;
-    this.password = password;
+    this.connection = new net.Socket();
 
     this.logger = winston.createLogger({
       level: 'info',
@@ -68,43 +58,41 @@ export = class Fishbowl {
       ]
     });
 
-    this.setupConnection();
+    this.connectToFishbowl();
   }
 
-  public partGetRq = (num: string, getImage: boolean): string => {
-    return JSON.stringify({
-      FbiJson: {
-        Ticket: {
-          Key: this.key
-        },
-        FbiMsgsRq: {
-          PartGetRq: {
-            Number: num,
-            GetImage: getImage
-          }
-        }
-      }
-    });
-  };
-
   /**
-   * @param req - The request JSON in string format (use requests.js for this info)
+   * @param req - The request you would like to make
+   * @param options - The options for the specific request you are making
    * @param cb - (err: string, res: string)
    */
   public sendRequest = (
     req: string,
+    options: any,
     cb: (err: string | null, res: any) => void
   ): void => {
     if (this.waiting && !req.includes('LoginRq')) {
-      this.reqQueue.push({ req, cb });
+      this.reqQueue.push({ req, options, cb });
       return;
+    }
+
+    let reqToFishbowl = '';
+    switch (req) {
+      case 'LoginRq': {
+        reqToFishbowl = this.loginRequest(options.username, options.password);
+        break;
+      }
+      case 'PartGetRq': {
+        reqToFishbowl = this.partGetRq(options.num, options.getImage);
+        break;
+      }
     }
 
     this.waiting = true;
     if (!this.connected) {
       this.logger.info('Not connected to server, connecting now...');
-      this.reqQueue.push({ req, cb });
-      this.setupConnection();
+      this.reqQueue.push({ req, options, cb });
+      this.connectToFishbowl();
       return;
     }
 
@@ -142,30 +130,22 @@ export = class Fishbowl {
     });
 
     const reqLength = Buffer.alloc(4);
-    reqLength.writeIntBE(Buffer.byteLength(req, 'utf8'), 0, 4);
+    reqLength.writeIntBE(Buffer.byteLength(reqToFishbowl, 'utf8'), 0, 4);
     this.connection.write(reqLength);
-    this.connection.write(req);
+    this.connection.write(reqToFishbowl);
   };
 
   /**
-   * Setup connection with Fishbowl and send a login request
+   * Setup connection with Fishbowl
    */
-  private setupConnection = (): void => {
+  private connectToFishbowl = (): void => {
     let resLength: number | undefined;
     let resData: any;
 
     this.connection.connect(this.port, this.host, () => {
       this.connected = true;
-      this.sendRequest(this.loginRequest(), (err, res) => {
-        if (err) {
-          this.logger.error(`Error logging into Fishbowl: ${err}`);
-          return;
-        }
-
-        this.key = res.FbiJson.Ticket.Key;
-        this.userId = res.FbiJson.Ticket.UserID;
-        this.deque();
-      });
+      this.logger.info('Connected to Fishbowl...');
+      this.deque();
     });
 
     this.connection.on('close', () => {
@@ -214,14 +194,11 @@ export = class Fishbowl {
     this.waiting = false;
     if (this.reqQueue.length > 0) {
       const queuedReq = this.reqQueue.shift();
-      this.sendRequest(queuedReq.req, queuedReq.cb);
+      this.sendRequest(queuedReq.req, queuedReq.options, queuedReq.cb);
     }
   };
 
-  /**
-   * @return {string} login request string for the server
-   */
-  private loginRequest = (): string => {
+  private loginRequest = (username: string, password: string): string => {
     return JSON.stringify({
       FbiJson: {
         Ticket: {
@@ -232,11 +209,27 @@ export = class Fishbowl {
             IAID: this.IAID,
             IAName: this.IAName,
             IADescription: this.IADescription,
-            UserName: this.username,
+            UserName: username,
             UserPassword: crypto
               .createHash('md5')
-              .update(this.password)
+              .update(password)
               .digest('base64')
+          }
+        }
+      }
+    });
+  };
+
+  private partGetRq = (num: string, getImage: boolean): string => {
+    return JSON.stringify({
+      FbiJson: {
+        Ticket: {
+          Key: this.key
+        },
+        FbiMsgsRq: {
+          PartGetRq: {
+            Number: num,
+            GetImage: getImage
           }
         }
       }
