@@ -2,8 +2,8 @@ import crypto from 'crypto';
 import net from 'net';
 import winston from 'winston';
 
-import { Types } from './requestTypes';
 import errorCodes from './errorCodes.json';
+import { Types } from './requestTypes';
 
 interface ConstructorOptions {
   host?: string;
