@@ -51,15 +51,7 @@ export = class Fishbowl {
    * @param username - Fishbowl username
    * @param password - Fishbowl password
    */
-  constructor({
-    host = '127.0.0.1',
-    port = 28192,
-    IAID = 54321,
-    IAName = 'Fishbowljs',
-    IADescription = 'Fishbowljs helper',
-    username = 'admin',
-    password = 'admin'
-  }: ConstructorOptions) {
+  constructor({ host = '127.0.0.1', port = 28192, IAID = 54321, IAName = 'Fishbowljs', IADescription = 'Fishbowljs helper', username = 'admin', password = 'admin' }: ConstructorOptions) {
     this.host = host;
     this.port = port;
     this.IAID = IAID;
@@ -104,11 +96,7 @@ export = class Fishbowl {
    * @param options - The options for the specific request you are making
    * @param cb - (err: Error | null, res: JSON)
    */
-  public sendRequest = (
-    req: string,
-    options: any,
-    cb: (err: Error | null, res: any) => void
-  ): void => {
+  public sendRequest = (req: string, options: any, cb: (err: Error | null, res: any) => void): void => {
     if (req === 'LoginRq' && this.loggedIn) {
       return;
     }
@@ -147,18 +135,14 @@ export = class Fishbowl {
       if (data.FbiJson.FbiMsgsRs.statusCode !== 1000) {
         const fbError: Error = {
           code: data.FbiJson.FbiMsgsRs.statusCode,
-          message:
-            data.FbiJson.FbiMsgsRs.statusMessage ||
-            this.errorCodes[data.FbiJson.FbiMsgsRs.statusCode]
+          message: data.FbiJson.FbiMsgsRs.statusMessage || this.errorCodes[data.FbiJson.FbiMsgsRs.statusCode]
         };
         this.logger.error(fbError);
         cb(fbError, null);
       } else if (data.FbiJson.FbiMsgsRs[fbData].statusCode !== 1000) {
         const fbError: Error = {
           code: data.FbiJson.FbiMsgsRs[fbData].statusCode,
-          message:
-            data.FbiJson.FbiMsgsRs[fbData].statusMessage ||
-            this.errorCodes[data.FbiJson.FbiMsgsRs[fbData].statusCode]
+          message: data.FbiJson.FbiMsgsRs[fbData].statusMessage || this.errorCodes[data.FbiJson.FbiMsgsRs[fbData].statusCode]
         };
         this.logger.error(fbError);
         cb(fbError, null);
