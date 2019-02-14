@@ -1,6 +1,8 @@
 import crypto from 'crypto';
 import net from 'net';
 import winston from 'winston';
+
+import { Types } from './requestTypes';
 import errorCodes from './errorCodes.json';
 
 interface ConstructorOptions {
@@ -11,7 +13,6 @@ interface ConstructorOptions {
   IADescription?: string;
   username?: string;
   password?: string;
-  autoLogin?: boolean;
 }
 
 interface Error {
@@ -101,6 +102,10 @@ export = class Fishbowl {
       return;
     }
 
+    if (req === 'LogoutRq') {
+      this.loggedIn = false;
+    }
+
     if (this.waiting) {
       this.reqQueue.push({ req, options, cb });
       return;
@@ -112,8 +117,12 @@ export = class Fishbowl {
         reqToFishbowl = this.loginRequest();
         break;
       }
+      case 'LogoutRq': {
+        reqToFishbowl = this.logoutRequest();
+        break;
+      }
       case 'PartGetRq': {
-        reqToFishbowl = this.partGetRq(options.num, options.getImage);
+        reqToFishbowl = this.partGetRq(options);
         break;
       }
     }
@@ -240,6 +249,10 @@ export = class Fishbowl {
     });
   };
 
+  /*================================
+          FISHBOWL REQUESTS
+  ==================================*/
+
   private loginRequest = (): string => {
     return JSON.stringify({
       FbiJson: {
@@ -262,7 +275,20 @@ export = class Fishbowl {
     });
   };
 
-  private partGetRq = (num: string, getImage: boolean): string => {
+  private logoutRequest = (): string => {
+    return JSON.stringify({
+      FbiJson: {
+        Ticket: {
+            Key: this.key
+        },
+        FbiMsgsRq: {
+            LogoutRq: ''
+        }
+      }
+    });
+  };
+
+  private partGetRq = (options: Types.PartGet): string => {
     return JSON.stringify({
       FbiJson: {
         Ticket: {
@@ -270,8 +296,8 @@ export = class Fishbowl {
         },
         FbiMsgsRq: {
           PartGetRq: {
-            Number: num,
-            GetImage: getImage
+            Number: options.num,
+            GetImage: options.getImage
           }
         }
       }

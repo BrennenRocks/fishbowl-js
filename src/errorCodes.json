@@ -21,6 +21,8 @@
   "1150": "Request was invalid.",
   "1161": "Response was invalid.",
   "1162": "The login limit has been reached for the server's key.",
+  "1163": "Your API session has timed out.",
+  "1164": "Your API session has been logged out.",
   "1200": "Custom field is invalid.",
   "1300": "Was not able to find the memo _________.",
   "1301": "The memo was invalid.",
