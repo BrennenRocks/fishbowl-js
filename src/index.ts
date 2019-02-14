@@ -198,12 +198,10 @@ export = class Fishbowl {
     });
 
     this.connection.on('error', err => {
-      if (this.connection.listenerCount('done') > 0) {
-        this.logger.error(err);
-        this.connection.emit('done', err, null);
-      } else {
-        throw new Error(err.message);
-      }
+      this.logger.error(`Unexpected error... Disconnected from server, attempting to reconnect. ${err}`);
+      this.connected = false;
+      this.loggedIn = false;
+      this.connectToFishbowl(true);
     });
 
     this.connection.on('data', data => {
