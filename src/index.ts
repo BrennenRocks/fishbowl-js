@@ -279,10 +279,10 @@ export = class Fishbowl {
     return JSON.stringify({
       FbiJson: {
         Ticket: {
-            Key: this.key
+          Key: this.key
         },
         FbiMsgsRq: {
-            LogoutRq: ''
+          LogoutRq: ''
         }
       }
     });
