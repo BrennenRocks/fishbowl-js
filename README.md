@@ -43,7 +43,7 @@ fb.sendRequest('PartGetRq', { num: 'B201', getImage: true }, (err, req) => {
 ```
 
 ## Request options
-Reference [src/requestTypes.ts] (src/requestTypes.ts) to learn options parameters for the different requests
+Reference [src/requestTypes.ts](src/requestTypes.ts) to learn options parameters for the different requests
 
 ## Fishbowl API
-If you have questions regarding the actual Fishbowl API please visit [their wiki] (https://www.fishbowlinventory.com/wiki/Fishbowl_API)
+If you have questions regarding the actual Fishbowl API please visit [the Fishbowl API wiki](https://www.fishbowlinventory.com/wiki/Fishbowl_API)
