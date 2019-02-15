@@ -256,15 +256,23 @@ export = class Fishbowl {
       return s;
     }
 
-    let data: any = {};
-
-    const header = s.FbiJson.FbiMsgsRs.ExecuteQueryRs.Rows.Row[0].split(',');
-    delete s.FbiJson.FbiMsgsRs.ExecuteQueryRs.Rows.Row[0];
-    for (const row in s.FbiJson.FbiMsgsRs.ExecuteQueryRs.Rows.Row) {
-      header.forEach((key: string, i: number) => data[key] = row[i]);
+    const row = s.FbiJson.FbiMsgsRs.ExecuteQueryRs.Rows.Row;
+    for (let i = 0; i < row.length; i++) {
+      row[i] = row[i].replace(/"/g, '');
     }
 
-    s.FbiJson.FbiMsgsRs.ExecuteQueryRs.Rows = data;
+    const rows = [];
+    const header = s.FbiJson.FbiMsgsRs.ExecuteQueryRs.Rows.Row[0].split(',');
+    row.splice(0, 1);
+    let data: any = {};
+    for (const line of row) {
+      const arr = line.split(',');
+      header.forEach((key: string, j: number) => (data[key] = arr[j]));
+      rows.push(data);
+      data = {};
+    }
+
+    s.FbiJson.FbiMsgsRs.ExecuteQueryRs.Rows = rows;
     return s;
   };
 

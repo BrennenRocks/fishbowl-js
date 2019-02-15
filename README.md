@@ -32,7 +32,7 @@ fb.sendRequest('LoginRq', {}, (err, res) => {
   console.log(`Data: ${res}`);
 });
 
-fb.sendRequest('PartGetRq', { num: 'B201', getImage: true }, (err, req) => {
+fb.sendRequest('ExecuteQueryRq', { query: "select * from part where num='B201' or num='B202'" }, (err, res) => {
   if (err) {
     console.log(`Err: ${err.code} - ${err.message}`);
     return;
@@ -43,7 +43,7 @@ fb.sendRequest('PartGetRq', { num: 'B201', getImage: true }, (err, req) => {
 ```
 
 ## Request options
-Reference [src/requestTypes.ts](src/requestTypes.ts) to learn options parameters for the different requests
+Reference [src/requestTypes.ts](src/requestTypes.ts) to learn option parameters for the different requests
 
 ## Fishbowl API
 If you have questions regarding the actual Fishbowl API please visit [the Fishbowl API wiki](https://www.fishbowlinventory.com/wiki/Fishbowl_API)
