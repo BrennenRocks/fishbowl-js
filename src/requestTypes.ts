@@ -3,4 +3,9 @@ export namespace Types {
     num: string;
     getImage?: boolean;
   }
+
+  export interface ExecuteQuery {
+    name?: string;
+    query?: string;
+  }
 }

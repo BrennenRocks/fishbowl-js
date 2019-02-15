@@ -121,6 +121,10 @@ export = class Fishbowl {
         reqToFishbowl = this.logoutRequest();
         break;
       }
+      case 'ExecuteQueryRq': {
+        reqToFishbowl = this.executeQueryRq(options);
+        break;
+      }
       case 'PartGetRq': {
         reqToFishbowl = this.partGetRq(options);
         break;
@@ -161,7 +165,7 @@ export = class Fishbowl {
           this.key = data.FbiJson.Ticket.Key;
           this.userId = data.FbiJson.Ticket.UserID;
         } else if (fbData === 'ExecuteQueryRs') {
-          // TODO: parse query response
+          data = this.parseCsv(data);
         }
 
         cb(null, data.FbiJson.FbiMsgsRs[fbData]);
@@ -247,6 +251,23 @@ export = class Fishbowl {
     });
   };
 
+  private parseCsv = (s: any): any => {
+    if (!Array.isArray(s.FbiJson.FbiMsgsRs.ExecuteQueryRs.Rows.Row)) {
+      return s;
+    }
+
+    let data: any = {};
+
+    const header = s.FbiJson.FbiMsgsRs.ExecuteQueryRs.Rows.Row[0].split(',');
+    delete s.FbiJson.FbiMsgsRs.ExecuteQueryRs.Rows.Row[0];
+    for (const row in s.FbiJson.FbiMsgsRs.ExecuteQueryRs.Rows.Row) {
+      header.forEach((key: string, i: number) => data[key] = row[i]);
+    }
+
+    s.FbiJson.FbiMsgsRs.ExecuteQueryRs.Rows = data;
+    return s;
+  };
+
   /*================================
           FISHBOWL REQUESTS
   ==================================*/
@@ -281,6 +302,22 @@ export = class Fishbowl {
         },
         FbiMsgsRq: {
           LogoutRq: ''
+        }
+      }
+    });
+  };
+
+  private executeQueryRq = (options: Types.ExecuteQuery): string => {
+    return JSON.stringify({
+      FbiJson: {
+        Ticket: {
+          Key: this.key
+        },
+        FbiMsgsRq: {
+          ExecuteQueryRq: {
+            Name: options.name,
+            Query: options.query
+          }
         }
       }
     });
