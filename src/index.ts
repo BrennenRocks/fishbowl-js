@@ -280,9 +280,9 @@ export = class Fishbowl {
     s.FbiJson.FbiMsgsRs.ExecuteQueryRs.Rows = rows;
     return s;
   };
-  
+
   private parseJsonToCsv = (o: object[]): string[] => {
-    let row: string[] = [];
+    const row: string[] = [];
     row.push(`${Object.keys(o[0])}`);
 
     for (const el of o) {
@@ -308,7 +308,10 @@ export = class Fishbowl {
             IAName: this.IAName,
             IADescription: this.IADescription,
             UserName: this.username,
-            UserPassword: crypto.createHash('md5').update(this.password).digest('base64')
+            UserPassword: crypto
+              .createHash('md5')
+              .update(this.password)
+              .digest('base64')
           }
         }
       }
