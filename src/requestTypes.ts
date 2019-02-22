@@ -8,4 +8,9 @@ export namespace Types {
     name?: string;
     query?: string;
   }
+  
+  export interface ImportQuery {
+    type: string;
+    row: object[]
+  }
 }

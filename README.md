@@ -23,6 +23,8 @@ const Fishbowl = require('fishbowl-js');
 
 const fb = new Fishbowl({});
 
+// If you have already approved this integration, this will be seemless.
+// If you have not approved the integration, you will need to approve it and then send the login request again.
 fb.sendRequest('LoginRq', {}, (err, res) => {
   if (err) {
     console.log(`Err: ${err.code} - ${err.message}`);
@@ -32,7 +34,65 @@ fb.sendRequest('LoginRq', {}, (err, res) => {
   console.log(`Data: ${res}`);
 });
 
-fb.sendRequest('ExecuteQueryRq', { query: "select * from part where num='B201' or num='B202'" }, (err, res) => {
+const partImport = [
+  {
+    partNumber: '1API',
+    partDescription: 'Fishbowl-js',
+    partDetails: '',
+    uom: 'ea',
+    upc: '',
+    partType: 'Inventory',
+    active: 'true',
+    abcCode: 'N',
+    weight: '210',
+    weightUom: 'lbs',
+    width: '0',
+    height: '0',
+    length: '0',
+    sizeUom: 'ft',
+    primaryTracking: '',
+    alertNote: '',
+    pictureUrl: '',
+    'Tracks-Lot Number': 'false',
+    'Tracks-Revision Level': 'false',
+    'Tracks-Expiration Date': 'false',
+    'Tracks-Serial Number': 'false'
+  },
+  {
+    partNumber: '2API',
+    partDescription: 'Fishbowl-js2',
+    partDetails: '',
+    uom: 'ea',
+    upc: '',
+    partType: 'Inventory',
+    active: 'false',
+    abcCode: 'N',
+    weight: '210',
+    weightUom: 'lbs',
+    width: '0',
+    height: '0',
+    length: '0',
+    sizeUom: 'ft',
+    primaryTracking: '',
+    alertNote: '',
+    pictureUrl: '',
+    'Tracks-Lot Number': 'false',
+    'Tracks-Revision Level': 'false',
+    'Tracks-Expiration Date': 'false',
+    'Tracks-Serial Number': 'false'
+  }
+];
+
+fb.sendRequest('ImportRq', {type: 'ImportPart', row: partImport}, (err, res) => {
+  if (err) {
+    console.log(`err: ${err.code} - ${err.message}`);
+    return;
+  }
+
+  console.log(`Data: ${res}`);
+});
+
+fb.sendRequest('ExecuteQueryRq', { query: "select * from part where num='B201' or num='B202' or num='1API'" }, (err, res) => {
   if (err) {
     console.log(`Err: ${err.code} - ${err.message}`);
     return;

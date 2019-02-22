@@ -125,6 +125,10 @@ export = class Fishbowl {
         reqToFishbowl = this.executeQueryRq(options);
         break;
       }
+      case 'ImportRq': {
+        reqToFishbowl = this.importRq(options);
+        break;
+      }
       case 'PartGetRq': {
         reqToFishbowl = this.partGetRq(options);
         break;
@@ -165,7 +169,7 @@ export = class Fishbowl {
           this.key = data.FbiJson.Ticket.Key;
           this.userId = data.FbiJson.Ticket.UserID;
         } else if (fbData === 'ExecuteQueryRs') {
-          data = this.parseCsv(data);
+          data = this.parseCsvToJson(data);
         }
 
         cb(null, data.FbiJson.FbiMsgsRs[fbData]);
@@ -191,6 +195,7 @@ export = class Fishbowl {
       this.connected = true;
       this.logger.info('Connected to Fishbowl...');
       if (login) {
+        this.waiting = false;
         this.loginToFishbowl();
       }
       this.deque();
@@ -251,7 +256,7 @@ export = class Fishbowl {
     });
   };
 
-  private parseCsv = (s: any): any => {
+  private parseCsvToJson = (s: any): any => {
     if (!Array.isArray(s.FbiJson.FbiMsgsRs.ExecuteQueryRs.Rows.Row)) {
       return s;
     }
@@ -275,6 +280,17 @@ export = class Fishbowl {
     s.FbiJson.FbiMsgsRs.ExecuteQueryRs.Rows = rows;
     return s;
   };
+  
+  private parseJsonToCsv = (o: object[]): string[] => {
+    let row: string[] = [];
+    row.push(`${Object.keys(o[0])}`);
+
+    for (const el of o) {
+      row.push(`${Object.values(el)}`);
+    }
+
+    return row;
+  };
 
   /*================================
           FISHBOWL REQUESTS
@@ -292,10 +308,7 @@ export = class Fishbowl {
             IAName: this.IAName,
             IADescription: this.IADescription,
             UserName: this.username,
-            UserPassword: crypto
-              .createHash('md5')
-              .update(this.password)
-              .digest('base64')
+            UserPassword: crypto.createHash('md5').update(this.password).digest('base64')
           }
         }
       }
@@ -325,6 +338,24 @@ export = class Fishbowl {
           ExecuteQueryRq: {
             Name: options.name,
             Query: options.query
+          }
+        }
+      }
+    });
+  };
+
+  private importRq = (options: Types.ImportQuery): string => {
+    return JSON.stringify({
+      FbiJson: {
+        Ticket: {
+          Key: this.key
+        },
+        FbiMsgsRq: {
+          ImportRq: {
+            Type: options.type,
+            Rows: {
+              Row: this.parseJsonToCsv(options.row)
+            }
           }
         }
       }
