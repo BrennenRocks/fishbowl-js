@@ -133,6 +133,10 @@ export = class Fishbowl {
         reqToFishbowl = this.importHeaderRq(options);
         break;
       }
+      case 'IssueSORq': {
+        reqToFishbowl = this.issueSoRq(options);
+        break;
+      }
       case 'PartGetRq': {
         reqToFishbowl = this.partGetRq(options);
         break;
@@ -392,6 +396,21 @@ export = class Fishbowl {
         FbiMsgsRq: {
           ImportHeaderRq: {
             Type: options.type
+          }
+        }
+      }
+    });
+  };
+
+  private issueSoRq = (options: Types.IssueSoQuery): string => {
+    return JSON.stringify({
+      FbiJson: {
+        Ticket: {
+          Key: this.key
+        },
+        FbiMsgsRq: {
+          IssueSORq: {
+            SONumber: options.soNumber
           }
         }
       }

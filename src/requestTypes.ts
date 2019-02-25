@@ -17,4 +17,8 @@ export namespace Types {
   export interface ImportHeaderQuery {
     type: string;
   }
+
+  export interface IssueSoQuery {
+    soNumber: string;
+  }
 }
