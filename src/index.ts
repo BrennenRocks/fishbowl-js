@@ -129,6 +129,10 @@ export = class Fishbowl {
         reqToFishbowl = this.importRq(options);
         break;
       }
+      case 'ImportHeaderRq': {
+        reqToFishbowl = this.importHeaderRq(options);
+        break;
+      }
       case 'PartGetRq': {
         reqToFishbowl = this.partGetRq(options);
         break;
@@ -169,7 +173,9 @@ export = class Fishbowl {
           this.key = data.FbiJson.Ticket.Key;
           this.userId = data.FbiJson.Ticket.UserID;
         } else if (fbData === 'ExecuteQueryRs') {
-          data = this.parseCsvToJson(data);
+          data = this.parseExecuteQueryRqToJson(data);
+        } else if (fbData === 'ImportHeaderRs') {
+          data = this.parseImportHeaderRqToJson(data);
         }
 
         cb(null, data.FbiJson.FbiMsgsRs[fbData]);
@@ -256,7 +262,7 @@ export = class Fishbowl {
     });
   };
 
-  private parseCsvToJson = (s: any): any => {
+  private parseExecuteQueryRqToJson = (s: any): any => {
     if (!Array.isArray(s.FbiJson.FbiMsgsRs.ExecuteQueryRs.Rows.Row)) {
       return s;
     }
@@ -278,6 +284,18 @@ export = class Fishbowl {
     }
 
     s.FbiJson.FbiMsgsRs.ExecuteQueryRs.Rows = rows;
+    return s;
+  };
+
+  private parseImportHeaderRqToJson = (s: any): any => {
+    let row = s.FbiJson.FbiMsgsRs.ImportHeaderRs.Header.Row;
+    row = row.replace(/"/g, '');
+
+    const o: { [k: string]: any } = {};
+    const keys = row.split(',');
+    keys.forEach((el: string) => (o[el] = ''));
+
+    s.FbiJson.FbiMsgsRs.ImportHeaderRs.Header.Row = o;
     return s;
   };
 
@@ -359,6 +377,21 @@ export = class Fishbowl {
             Rows: {
               Row: this.parseJsonToCsv(options.row)
             }
+          }
+        }
+      }
+    });
+  };
+
+  private importHeaderRq = (options: Types.ImportHeaderQuery): string => {
+    return JSON.stringify({
+      FbiJson: {
+        Ticket: {
+          Key: this.key
+        },
+        FbiMsgsRq: {
+          ImportHeaderRq: {
+            Type: options.type
           }
         }
       }

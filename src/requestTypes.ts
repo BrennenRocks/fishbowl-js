@@ -13,4 +13,8 @@ export namespace Types {
     type: string;
     row: object[];
   }
+
+  export interface ImportHeaderQuery {
+    type: string;
+  }
 }
