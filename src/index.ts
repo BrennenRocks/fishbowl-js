@@ -137,6 +137,10 @@ export = class Fishbowl {
         reqToFishbowl = this.issueSoRq(options);
         break;
       }
+      case 'QuickShipRq': {
+        reqToFishbowl = this.quickShipRq(options);
+        break;
+      }
       case 'PartGetRq': {
         reqToFishbowl = this.partGetRq(options);
         break;
@@ -411,6 +415,24 @@ export = class Fishbowl {
         FbiMsgsRq: {
           IssueSORq: {
             SONumber: options.soNumber
+          }
+        }
+      }
+    });
+  };
+
+  private quickShipRq = (options: Types.QuickShipQuery): string => {
+    return JSON.stringify({
+      FbiJson: {
+        Ticket: {
+          Key: this.key
+        },
+        FbiMsgsRq: {
+          QuickShipRq: {
+            SONumber: options.soNumber,
+            fulfillServiceItems: options.fulfillServiceItems,
+            errorIfNotFulfilled: options.errorIfNotFulfilled,
+            shipDate: options.shipDate
           }
         }
       }

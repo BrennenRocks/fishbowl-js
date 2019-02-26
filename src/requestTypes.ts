@@ -21,4 +21,11 @@ export namespace Types {
   export interface IssueSoQuery {
     soNumber: string;
   }
+
+  export interface QuickShipQuery {
+    soNumber: string;
+    fulfillServiceItems?: boolean;
+    errorIfNotFulfilled?: boolean;
+    shipDate?: string;
+  }
 }
