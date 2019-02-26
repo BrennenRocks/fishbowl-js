@@ -100,6 +100,15 @@ fb.sendRequest('ExecuteQueryRq', { query: "select * from part where num='B201' o
 
   console.log(`Data: ${res}`);
 });
+
+fb.sendRequest('IssueSORq', { soNumber: '50053' }, (err, res) => {
+  if (err) {
+    console.log(`Err: ${err.code} - ${err.message}`);
+    return;
+  }
+
+  console.log(`Data: ${res}`);
+});
 ```
 
 ## Request options

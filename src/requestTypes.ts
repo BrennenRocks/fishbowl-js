@@ -28,4 +28,8 @@ export namespace Types {
     errorIfNotFulfilled?: boolean;
     shipDate?: string;
   }
+
+  export interface VoidSoQuery {
+    soNumber: string;
+  }
 }

@@ -68,17 +68,7 @@ export = class Fishbowl {
       format: winston.format.json(),
       transports: [
         new winston.transports.File({
-          level: 'error',
-          filename: 'error.log',
-          format: winston.format.combine(
-            winston.format.timestamp({
-              format: 'YYYY-MM-DD hh:mm:ss A ZZ'
-            }),
-            winston.format.json()
-          )
-        }),
-        new winston.transports.File({
-          filename: 'combined.log',
+          filename: 'fishbowl-js.log',
           format: winston.format.combine(
             winston.format.timestamp({
               format: 'YYYY-MM-DD hh:mm:ss A ZZ'
@@ -139,6 +129,10 @@ export = class Fishbowl {
       }
       case 'QuickShipRq': {
         reqToFishbowl = this.quickShipRq(options);
+        break;
+      }
+      case 'VoidSORq': {
+        reqToFishbowl = this.voidSoRq(options);
         break;
       }
       case 'PartGetRq': {
@@ -433,6 +427,21 @@ export = class Fishbowl {
             fulfillServiceItems: options.fulfillServiceItems,
             errorIfNotFulfilled: options.errorIfNotFulfilled,
             shipDate: options.shipDate
+          }
+        }
+      }
+    });
+  };
+
+  private voidSoRq = (options: Types.VoidSoQuery): string => {
+    return JSON.stringify({
+      FbiJson: {
+        Ticket: {
+          Key: this.key
+        },
+        FbiMsgsRq: {
+          VoidSORq: {
+            SONumber: options.soNumber
           }
         }
       }
