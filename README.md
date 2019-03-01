@@ -1,3 +1,4 @@
+[![npm](https://img.shields.io/npm/v/fishbowl-js.svg?color=orange)](https://www.npmjs.com/package/fishbowl-js)
 # Fishbowl-js
 
 ```
