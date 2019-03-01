@@ -1,5 +1,6 @@
 # Fishbowl-js
 The JavaScript wrapper for the Fishbowl API
+
 [![npm](https://img.shields.io/npm/v/fishbowl-js.svg?color=orange&style=flat-square)](https://www.npmjs.com/package/fishbowl-js)[![Downloads](https://img.shields.io/npm/dt/fishbowl-js.svg?style=flat-square)](https://npmcharts.com/compare/fishbowl-js?minimal=true)
 
 [![NPM](https://nodei.co/npm/fishbowl-js.png?downloads=true&downloadRank=true)](https://nodei.co/npm/fishbowl-js/)
