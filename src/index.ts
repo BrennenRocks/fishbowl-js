@@ -15,6 +15,12 @@ interface ConstructorOptions {
   password?: string;
 }
 
+interface RequestOptions {
+  req: string;
+  options?: any;
+  json?: boolean;
+}
+
 interface Error {
   code: number;
   message: string;
@@ -83,11 +89,10 @@ export = class Fishbowl {
   }
 
   /**
-   * @param req - The request you would like to make
-   * @param options - The options for the specific request you are making
+   * @param {RequestOptions} - holds the request type, options for that request, and whether you want the info in JSON or CSV
    * @param cb - (err: Error | null, res: JSON)
    */
-  public sendRequest = (req: string, options: any, cb: (err: Error | null, res: any) => void): void => {
+  public sendRequest = ({ req, options, json = true }: RequestOptions, cb?: (err: Error | null, res: any) => void): void => {
     if (req === 'LoginRq' && this.loggedIn) {
       return;
     }
@@ -97,7 +102,7 @@ export = class Fishbowl {
     }
 
     if (this.waiting) {
-      this.reqQueue.push({ req, options, cb });
+      this.reqQueue.push({ req, options, json, cb });
       return;
     }
 
@@ -144,14 +149,19 @@ export = class Fishbowl {
     this.waiting = true;
     if (!this.connected) {
       this.logger.info('Not connected to server, connecting now...');
-      this.reqQueue.push({ req, options, cb });
+      this.reqQueue.push({ req, options, json, cb });
       this.connectToFishbowl(true);
       return;
     }
 
     this.connection.once('done', (err, data) => {
-      if (err) {
+      if (err && cb !== undefined) {
         return cb(err, null);
+      }
+
+      if (err) {
+        this.logger.error(err);
+        return;
       }
 
       const fbData = Object.keys(data.FbiJson.FbiMsgsRs)[1];
@@ -161,26 +171,32 @@ export = class Fishbowl {
           message: data.FbiJson.FbiMsgsRs.statusMessage || this.errorCodes[data.FbiJson.FbiMsgsRs.statusCode]
         };
         this.logger.error(fbError);
-        cb(fbError, null);
+        if (cb !== undefined) {
+          cb(fbError, null);
+        }
       } else if (data.FbiJson.FbiMsgsRs[fbData].statusCode !== 1000) {
         const fbError: Error = {
           code: data.FbiJson.FbiMsgsRs[fbData].statusCode,
           message: data.FbiJson.FbiMsgsRs[fbData].statusMessage || this.errorCodes[data.FbiJson.FbiMsgsRs[fbData].statusCode]
         };
         this.logger.error(fbError);
-        cb(fbError, null);
+        if (cb !== undefined) {
+          cb(fbError, null);
+        }
       } else {
         if (fbData === 'LoginRs') {
           this.loggedIn = true;
           this.key = data.FbiJson.Ticket.Key;
           this.userId = data.FbiJson.Ticket.UserID;
-        } else if (fbData === 'ExecuteQueryRs') {
+        } else if (fbData === 'ExecuteQueryRs' && json) {
           data = this.parseExecuteQueryRqToJson(data);
-        } else if (fbData === 'ImportHeaderRs') {
+        } else if (fbData === 'ImportHeaderRs' && json) {
           data = this.parseImportHeaderRqToJson(data);
         }
 
-        cb(null, data.FbiJson.FbiMsgsRs[fbData]);
+        if (cb !== undefined) {
+          cb(null, data.FbiJson.FbiMsgsRs[fbData]);
+        }
       }
 
       this.deque();
@@ -254,12 +270,12 @@ export = class Fishbowl {
     this.waiting = false;
     if (this.reqQueue.length > 0) {
       const queuedReq = this.reqQueue.shift();
-      this.sendRequest(queuedReq.req, queuedReq.options, queuedReq.cb);
+      this.sendRequest({ req: queuedReq.req, options: queuedReq.options, json: queuedReq.json }, queuedReq.cb);
     }
   };
 
   private loginToFishbowl = (): void => {
-    this.sendRequest('LoginRq', {}, (err, res) => {
+    this.sendRequest({ req: 'LoginRq' }, (err, res) => {
       this.deque();
     });
   };

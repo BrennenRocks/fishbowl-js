@@ -19,14 +19,9 @@ const fb = new Fishbowl({
   });
 ```
 
+All requests by default will send back the data in JSON format.
 ```javascript
-const Fishbowl = require('fishbowl-js');
-
-const fb = new Fishbowl({});
-
-// If you have already approved this integration, this will be seemless.
-// If you have not approved the integration, you will need to approve it and then send the login request again.
-fb.sendRequest('LoginRq', {}, (err, res) => {
+fb.sendRequest({ req: 'ExecuteQueryRq', options: { query: "select * from part where num='B201'" } }, (err, res) => {
   if (err) {
     console.log(`Err: ${err.code} - ${err.message}`);
     return;
@@ -34,6 +29,28 @@ fb.sendRequest('LoginRq', {}, (err, res) => {
 
   console.log(`Data: ${res}`);
 });
+```
+
+ If the request allows it and you desire it, the request could send the data back in CSV format. Notice the json flag as the third attribute in the RequestOptions.
+ ```javascript
+fb.sendRequest({ req: 'ExecuteQueryRq', options: { query: "select * from part where num='B201'" }, json: false }, (err, res) => {
+  if (err) {
+    console.log(`Err: ${err.code} - ${err.message}`);
+    return;
+  }
+
+  console.log(`Data: ${res}`);
+});
+ ```
+
+```javascript
+const Fishbowl = require('fishbowl-js');
+
+const fb = new Fishbowl({});
+
+// If you have already approved this integration, this will be seamless.
+// If you have not approved the integration, you will need to approve it and then send the login request again.
+fb.sendRequest({ req: 'LoginRq' });
 
 const partImport = [
   {
@@ -84,7 +101,7 @@ const partImport = [
   }
 ];
 
-fb.sendRequest('ImportRq', {type: 'ImportPart', row: partImport}, (err, res) => {
+fb.sendRequest({ req: 'ImportRq', options: { type: 'ImportPart', row: partImport } }, (err, res) => {
   if (err) {
     console.log(`err: ${err.code} - ${err.message}`);
     return;
@@ -93,7 +110,7 @@ fb.sendRequest('ImportRq', {type: 'ImportPart', row: partImport}, (err, res) => 
   console.log(`Data: ${res}`);
 });
 
-fb.sendRequest('ExecuteQueryRq', { query: "select * from part where num='B201' or num='B202' or num='1API'" }, (err, res) => {
+fb.sendRequest({ req: 'ExecuteQueryRq', options: { query: "select * from part where num='B201' or num='B202' or num='1API'" }, json: false }, (err, res) => {
   if (err) {
     console.log(`Err: ${err.code} - ${err.message}`);
     return;
@@ -102,14 +119,7 @@ fb.sendRequest('ExecuteQueryRq', { query: "select * from part where num='B201' o
   console.log(`Data: ${res}`);
 });
 
-fb.sendRequest('IssueSORq', { soNumber: '50053' }, (err, res) => {
-  if (err) {
-    console.log(`Err: ${err.code} - ${err.message}`);
-    return;
-  }
-
-  console.log(`Data: ${res}`);
-});
+fb.sendRequest({ req: 'IssueSORq', options: { soNumber: '50053' } });
 ```
 
 ## Request options
