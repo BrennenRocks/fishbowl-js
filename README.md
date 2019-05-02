@@ -43,6 +43,18 @@ fb.sendRequest({ req: 'ExecuteQueryRq', options: { query: "select * from part wh
 });
  ```
 
+ All valid API requests are accepted, not only the requests documented on [the Fishbowl API wiki](https://www.fishbowlinventory.com/wiki/Fishbowl_API)
+ ```javascript
+ fb.sendRequest({req: 'PartGetRq', options: { Number: 'B201', GetImage: false }}, (err, res) => {
+  if (err) {
+    console.log(`Err: ${err.code} - ${err.message}`);
+    return;
+  }
+
+  console.log(`Data: ${res}`);
+});
+ ```
+
 ```javascript
 const Fishbowl = require('fishbowl-js');
 

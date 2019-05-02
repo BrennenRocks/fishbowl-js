@@ -140,9 +140,8 @@ export = class Fishbowl {
         reqToFishbowl = this.voidSoRq(options);
         break;
       }
-      case 'PartGetRq': {
-        reqToFishbowl = this.partGetRq(options);
-        break;
+      default: {
+        reqToFishbowl = this.customRq(req, options);
       }
     }
 
@@ -464,17 +463,14 @@ export = class Fishbowl {
     });
   };
 
-  private partGetRq = (options: Types.PartGet): string => {
+  private customRq = (req: string, options: object): string => {
     return JSON.stringify({
       FbiJson: {
         Ticket: {
           Key: this.key
         },
         FbiMsgsRq: {
-          PartGetRq: {
-            Number: options.num,
-            GetImage: options.getImage
-          }
+          [req]: options
         }
       }
     });
