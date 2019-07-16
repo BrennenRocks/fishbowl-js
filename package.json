@@ -44,6 +44,7 @@
     "typescript": "^3.3.3"
   },
   "dependencies": {
-    "winston": "^3.2.1"
+    "winston": "^3.2.1",
+    "jquery-csv": "^1.0.3"    
   }
 }

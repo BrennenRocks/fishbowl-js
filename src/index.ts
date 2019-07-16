@@ -1,6 +1,7 @@
 import crypto from 'crypto';
 import net from 'net';
 import winston from 'winston';
+import csv from 'jquery-csv';
 
 import errorCodes from './errorCodes.json';
 import { Types } from './requestTypes';
@@ -322,16 +323,13 @@ export = class Fishbowl {
     }
 
     const row = s.FbiJson.FbiMsgsRs.ExecuteQueryRs.Rows.Row;
-    for (let i = 0; i < row.length; i++) {
-      row[i] = row[i].replace(/"/g, '');
-    }
 
     const rows = [];
-    const header = s.FbiJson.FbiMsgsRs.ExecuteQueryRs.Rows.Row[0].split(',');
+    const header = csv.toArray(row[0]);
     row.splice(0, 1);
     let data: any = {};
     for (const line of row) {
-      const arr = line.split(',');
+      const arr = csv.toArray(line);
       header.forEach((key: string, j: number) => (data[key] = arr[j]));
       rows.push(data);
       data = {};
