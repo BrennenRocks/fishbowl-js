@@ -15,7 +15,8 @@ const fb = new Fishbowl({
     IAName = 'Fishbowljs',
     IADescription = 'Fishbowljs helper',
     username = 'admin',
-    password = 'admin'
+    password = 'admin',
+    useLogger = true
   });
 ```
 
@@ -45,7 +46,7 @@ fb.sendRequest({ req: 'ExecuteQueryRq', options: { query: "select * from part wh
 
  All valid API requests are accepted, not only the requests documented on [the Fishbowl API wiki](https://www.fishbowlinventory.com/wiki/Fishbowl_API)
  ```javascript
- fb.sendRequest({req: 'PartGetRq', options: { Number: 'B201', GetImage: false }}, (err, res) => {
+ fb.sendRequest({req: 'PartGetRq', options: { Number: 'B201', GetImage: false } }, (err, res) => {
   if (err) {
     console.log(`Err: ${err.code} - ${err.message}`);
     return;
@@ -139,3 +140,6 @@ Reference [src/requestTypes.ts](src/requestTypes.ts) to learn option parameters 
 
 ## Fishbowl API
 If you have questions regarding the actual Fishbowl API please visit [the Fishbowl API wiki](https://www.fishbowlinventory.com/wiki/Fishbowl_API)
+
+## Donate
+Feel free to [donate](https://paypal.me/brennenrocks) to support Fishbowl-js! This project is Open Source and is not affiliated with Fishbowl Inventory.

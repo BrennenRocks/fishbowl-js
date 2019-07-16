@@ -13,6 +13,7 @@ interface ConstructorOptions {
   IADescription?: string;
   username?: string;
   password?: string;
+  useLogger?: boolean;
 }
 
 interface RequestOptions {
@@ -46,6 +47,7 @@ export = class Fishbowl {
   private username: string;
   private password: string;
 
+  private useLogger: boolean;
   private logger: any;
 
   /**
@@ -58,7 +60,16 @@ export = class Fishbowl {
    * @param username - Fishbowl username
    * @param password - Fishbowl password
    */
-  constructor({ host = '127.0.0.1', port = 28192, IAID = 54321, IAName = 'Fishbowljs', IADescription = 'Fishbowljs helper', username = 'admin', password = 'admin' }: ConstructorOptions) {
+  constructor({
+    host = '127.0.0.1',
+    port = 28192,
+    IAID = 54321,
+    IAName = 'Fishbowljs',
+    IADescription = 'Fishbowljs helper',
+    username = 'admin',
+    password = 'admin',
+    useLogger = true
+  }: ConstructorOptions) {
     this.host = host;
     this.port = port;
     this.IAID = IAID;
@@ -68,22 +79,25 @@ export = class Fishbowl {
     this.password = password;
     this.connection = new net.Socket();
     this.errorCodes = errorCodes;
+    this.useLogger = useLogger;
 
-    this.logger = winston.createLogger({
-      level: 'info',
-      format: winston.format.json(),
-      transports: [
-        new winston.transports.File({
-          filename: 'fishbowl-js.log',
-          format: winston.format.combine(
-            winston.format.timestamp({
-              format: 'YYYY-MM-DD hh:mm:ss A ZZ'
-            }),
-            winston.format.json()
-          )
-        })
-      ]
-    });
+    if (useLogger) {
+      this.logger = winston.createLogger({
+        level: 'info',
+        format: winston.format.json(),
+        transports: [
+          new winston.transports.File({
+            filename: 'fishbowl-js.log',
+            format: winston.format.combine(
+              winston.format.timestamp({
+                format: 'YYYY-MM-DD hh:mm:ss A ZZ'
+              }),
+              winston.format.json()
+            )
+          })
+        ]
+      });
+    }
 
     this.connectToFishbowl(false);
   }
@@ -147,7 +161,10 @@ export = class Fishbowl {
 
     this.waiting = true;
     if (!this.connected) {
-      this.logger.info('Not connected to server, connecting now...');
+      if (this.useLogger) {
+        this.logger.info('Not connected to server, connecting now...');
+      }
+
       this.reqQueue.push({ req, options, json, cb });
       this.connectToFishbowl(true);
       return;
@@ -159,7 +176,10 @@ export = class Fishbowl {
       }
 
       if (err) {
-        this.logger.error(err);
+        if (this.useLogger) {
+          this.logger.error(err);
+        }
+
         return;
       }
 
@@ -169,7 +189,11 @@ export = class Fishbowl {
           code: data.FbiJson.FbiMsgsRs.statusCode,
           message: data.FbiJson.FbiMsgsRs.statusMessage || this.errorCodes[data.FbiJson.FbiMsgsRs.statusCode]
         };
-        this.logger.error(fbError);
+
+        if (this.useLogger) {
+          this.logger.error(fbError);
+        }
+
         if (cb !== undefined) {
           cb(fbError, null);
         }
@@ -178,7 +202,11 @@ export = class Fishbowl {
           code: data.FbiJson.FbiMsgsRs[fbData].statusCode,
           message: data.FbiJson.FbiMsgsRs[fbData].statusMessage || this.errorCodes[data.FbiJson.FbiMsgsRs[fbData].statusCode]
         };
-        this.logger.error(fbError);
+
+        if (this.useLogger) {
+          this.logger.error(fbError);
+        }
+
         if (cb !== undefined) {
           cb(fbError, null);
         }
@@ -216,7 +244,10 @@ export = class Fishbowl {
 
     this.connection.connect(this.port, this.host, () => {
       this.connected = true;
-      this.logger.info('Connected to Fishbowl...');
+      if (this.useLogger) {
+        this.logger.info('Connected to Fishbowl...');
+      }
+
       if (login) {
         this.waiting = false;
         this.loginToFishbowl();
@@ -225,12 +256,18 @@ export = class Fishbowl {
     });
 
     this.connection.on('close', () => {
-      this.logger.info('Disconnected from Fishbowl');
+      if (this.useLogger) {
+        this.logger.info('Disconnected from Fishbowl');
+      }
+
       this.connected = false;
     });
 
     this.connection.on('error', err => {
-      this.logger.error(`Unexpected error... Disconnected from server, attempting to reconnect. ${err}`);
+      if (this.useLogger) {
+        this.logger.error(`Unexpected error... Disconnected from server, attempting to reconnect. ${err}`);
+      }
+
       this.connected = false;
       this.loggedIn = false;
       this.connectToFishbowl(true);
@@ -256,7 +293,7 @@ export = class Fishbowl {
         }
 
         this.connection.emit('done', null, resJson);
-      } else {
+      } else if (this.useLogger) {
         this.logger.info('Waiting for more data from Fishbowl...');
       }
     });
