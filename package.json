@@ -45,6 +45,6 @@
   },
   "dependencies": {
     "winston": "^3.2.1",
-    "jquery-csv": "^1.0.3"    
+    "jquery-csv": "^1.0.3"
   }
 }

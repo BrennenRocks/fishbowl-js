@@ -1,7 +1,7 @@
 import crypto from 'crypto';
 import net from 'net';
 import winston from 'winston';
-import csv from 'jquery-csv';
+const csv = require('jquery-csv');
 
 import errorCodes from './errorCodes.json';
 import { Types } from './requestTypes';
