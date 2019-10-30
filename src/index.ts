@@ -105,6 +105,22 @@ export = class Fishbowl {
 
   /**
    * @param {RequestOptions} - holds the request type, options for that request, and whether you want the info in JSON or CSV
+   * @returns Promise
+   */
+  public sendRequestPromise = <T>({ req, options, json = true }: RequestOptions): Promise<T> => {
+    return new Promise((resolve, reject) => {
+      this.sendRequest({ req, options, json }, (err, res) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(res);
+        }
+      });
+    });
+  };
+
+  /**
+   * @param {RequestOptions} - holds the request type, options for that request, and whether you want the info in JSON or CSV
    * @param cb - (err: Error | null, res: JSON)
    */
   public sendRequest = ({ req, options, json = true }: RequestOptions, cb?: (err: Error | null, res: any) => void): void => {

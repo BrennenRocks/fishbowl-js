@@ -20,6 +20,23 @@ const fb = new Fishbowl({
   });
 ```
 
+### Versions >= 2.3.0 can now use async await with the sendRequestPromise({ req, options, json }) function
+
+```javascript
+const executeQuery = async () => {
+  try {
+    const part = await fb.sendRequestPromise({ req: 'ExecuteQueryRq', options: { query: 'select * from part where num = "B201"' } });
+    const product = await fb.sendRequestPromise({ req: 'ExecuteQueryRq', options: { query: 'select * from product where num = "B202"' } });
+    console.log(`Part: ${part}`);
+    console.log(`Product: ${product}`);
+  } catch (err) {
+    console.log(`Err: ${err.code} - ${err.message}`);
+  }
+}
+
+executeQuery();
+```
+
 All requests by default will send back the data in JSON format.
 ```javascript
 fb.sendRequest({ req: 'ExecuteQueryRq', options: { query: "select * from part where num='B201'" } }, (err, res) => {
@@ -133,6 +150,19 @@ fb.sendRequest({ req: 'ExecuteQueryRq', options: { query: "select * from part wh
 });
 
 fb.sendRequest({ req: 'IssueSORq', options: { soNumber: '50053' } });
+
+const executeQuery = async () => {
+  try {
+    const part = await fb.sendRequestPromise({ req: 'ExecuteQueryRq', options: { query: "select * from part where num='B201' or num='B202' or num='1API'" } });
+    const product = await fb.sendRequestPromise({ req: 'ExecuteQueryRq', options: { query: "select * from product where num = 'B202'" } });
+    console.log(`Part: ${part}`);
+    console.log(`Product: ${product}`);
+  } catch (err) {
+    console.log(`Err: ${err.code} - ${err.message}`);
+  }
+}
+
+executeQuery();
 ```
 
 ## Request options
