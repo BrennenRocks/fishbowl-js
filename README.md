@@ -5,6 +5,15 @@ The JavaScript wrapper for the Fishbowl API
 
 [![NPM](https://nodei.co/npm/fishbowl-js.png?downloads=true&downloadRank=true)](https://nodei.co/npm/fishbowl-js/)
 
+## Request options
+Reference [src/requestTypes.ts](src/requestTypes.ts) to learn option parameters for the different requests
+
+## Fishbowl API
+If you have questions regarding the actual Fishbowl API please visit [the Fishbowl API wiki](https://www.fishbowlinventory.com/wiki/Fishbowl_API)
+
+## Donate
+Feel free to [donate](https://paypal.me/brennenrocks) to support Fishbowl-js! This project is Open Source and is not affiliated with Fishbowl Inventory.
+
 ## Usage
 The default options for the constructor are 
 ```javascript
@@ -140,20 +149,11 @@ fb.sendRequest({ req: 'ImportRq', options: { type: 'ImportPart', row: partImport
   console.log(`Data: ${res}`);
 });
 
-fb.sendRequest({ req: 'ExecuteQueryRq', options: { query: "select * from part where num='B201' or num='B202' or num='1API'" }, json: false }, (err, res) => {
-  if (err) {
-    console.log(`Err: ${err.code} - ${err.message}`);
-    return;
-  }
-
-  console.log(`Data: ${res}`);
-});
-
 fb.sendRequest({ req: 'IssueSORq', options: { soNumber: '50053' } });
 
 const executeQuery = async () => {
   try {
-    const part = await fb.sendRequestPromise({ req: 'ExecuteQueryRq', options: { query: "select * from part where num='B201' or num='B202' or num='1API'" } });
+    const part = await fb.sendRequestPromise({ req: 'ExecuteQueryRq', options: { query: "select * from part where num='B201' or num='B202' or num='1API'" }, json: false });
     const product = await fb.sendRequestPromise({ req: 'ExecuteQueryRq', options: { query: "select * from product where num = 'B202'" } });
     console.log(`Part: ${part}`);
     console.log(`Product: ${product}`);
@@ -164,12 +164,3 @@ const executeQuery = async () => {
 
 executeQuery();
 ```
-
-## Request options
-Reference [src/requestTypes.ts](src/requestTypes.ts) to learn option parameters for the different requests
-
-## Fishbowl API
-If you have questions regarding the actual Fishbowl API please visit [the Fishbowl API wiki](https://www.fishbowlinventory.com/wiki/Fishbowl_API)
-
-## Donate
-Feel free to [donate](https://paypal.me/brennenrocks) to support Fishbowl-js! This project is Open Source and is not affiliated with Fishbowl Inventory.
