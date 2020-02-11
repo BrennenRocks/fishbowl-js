@@ -356,6 +356,7 @@ export = class Fishbowl {
   };
 
   private parseImportHeaderRqToJson = (s: any): any => {
+    // TODO: Double header imports return an array of Rows and not just a String
     let row = s.FbiJson.FbiMsgsRs.ImportHeaderRs.Header.Row;
     row = row.replace(/"/g, '');
 
@@ -371,7 +372,8 @@ export = class Fishbowl {
     const row: string[] = [];
     row.push(`${Object.keys(o[0])}`);
 
-    for (const el of o) {
+    for (let el of o) {
+      el = Object.values(el).map(e => `"${e}"`);
       row.push(`${Object.values(el)}`);
     }
 
