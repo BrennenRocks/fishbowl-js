@@ -18,14 +18,14 @@ Feel free to [donate](https://paypal.me/brennenrocks) to support Fishbowl-js! Th
 The default options for the constructor are 
 ```javascript
 const fb = new Fishbowl({
-    host = '127.0.0.1',
-    port = 28192,
-    IAID = 54321,
-    IAName = 'Fishbowljs',
-    IADescription = 'Fishbowljs helper',
-    username = 'admin',
-    password = 'admin',
-    useLogger = true
+    host: '127.0.0.1',
+    port: 28192,
+    IAID: 54321,
+    IAName: 'Fishbowljs',
+    IADescription: 'Fishbowljs helper',
+    username: 'admin',
+    password: 'admin',
+    useLogger: true
   });
 ```
 
