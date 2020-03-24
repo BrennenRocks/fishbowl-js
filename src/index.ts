@@ -29,14 +29,14 @@ interface Error {
 }
 
 interface SessionInfo {
-  loggedIn: boolean,
-  username: string,
-  key: string,
-  host: string,
-  port: number,
-  IAID: number,
-  IAName: string,
-  IADescription: string
+  loggedIn: boolean;
+  username: string;
+  key: string;
+  host: string;
+  port: number;
+  IAID: number;
+  IAName: string;
+  IADescription: string;
 }
 
 export = class Fishbowl {
@@ -126,7 +126,7 @@ export = class Fishbowl {
       port: this.port,
       IAID: this.IAID,
       IAName: this.IAName,
-      IADescription: this.IADescription,
+      IADescription: this.IADescription
     };
   }
 
