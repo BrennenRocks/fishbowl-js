@@ -28,6 +28,17 @@ interface Error {
   message: string;
 }
 
+interface SessionInfo {
+  loggedIn: boolean,
+  username: string,
+  key: string,
+  host: string,
+  port: number,
+  IAID: number,
+  IAName: string,
+  IADescription: string
+}
+
 export = class Fishbowl {
   private errorCodes: any;
   private loggedIn = false;
@@ -104,8 +115,24 @@ export = class Fishbowl {
   }
 
   /**
+   * @returns {SessionInfo}
+   */
+  public getSessionInfo(): SessionInfo {
+    return {
+      loggedIn: this.loggedIn,
+      username: this.username,
+      key: this.key,
+      host: this.host,
+      port: this.port,
+      IAID: this.IAID,
+      IAName: this.IAName,
+      IADescription: this.IADescription,
+    };
+  }
+
+  /**
    * @param {RequestOptions} - holds the request type, options for that request, and whether you want the info in JSON or CSV
-   * @returns Promise
+   * @returns {Promise}
    */
   public sendRequestPromise = <T>({ req, options, json = true }: RequestOptions): Promise<T> => {
     return new Promise((resolve, reject) => {
