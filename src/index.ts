@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import net from 'net';
+import * as net from 'net';
 import winston from 'winston';
 const csv = require('jquery-csv');
 
@@ -21,6 +21,7 @@ interface RequestOptions {
   req: string;
   options?: any;
   json?: boolean;
+  rawFishbowlResponse?: boolean;
 }
 
 interface Error {
@@ -131,12 +132,12 @@ export = class Fishbowl {
   }
 
   /**
-   * @param {RequestOptions} - holds the request type, options for that request, and whether you want the info in JSON or CSV
+   * @param {RequestOptions} - holds the request type, options for that request, whether you want the info in JSON or CSV, and whether you want the response formatted nicely or the raw response
    * @returns {Promise}
    */
-  public sendRequestPromise = <T>({ req, options, json = true }: RequestOptions): Promise<T> => {
+  public sendRequestPromise = <T>({ req, options, json = true, rawFishbowlResponse = false }: RequestOptions): Promise<T> => {
     return new Promise((resolve, reject) => {
-      this.sendRequest({ req, options, json }, (err, res) => {
+      this.sendRequest({ req, options, json, rawFishbowlResponse }, (err, res) => {
         if (err) {
           reject(err);
         } else {
@@ -147,10 +148,10 @@ export = class Fishbowl {
   };
 
   /**
-   * @param {RequestOptions} - holds the request type, options for that request, and whether you want the info in JSON or CSV
+   * @param {RequestOptions} - holds the request type, options for that request, whether you want the info in JSON or CSV, and whether you want the response formatted nicely or the raw response
    * @param cb - (err: Error | null, res: JSON)
    */
-  public sendRequest = ({ req, options, json = true }: RequestOptions, cb?: (err: Error | null, res: any) => void): void => {
+  public sendRequest = ({ req, options, json = true, rawFishbowlResponse = false }: RequestOptions, cb?: (err: Error | null, res: any) => void): void => {
     if (req === 'LoginRq' && this.loggedIn) {
       return;
     }
@@ -160,7 +161,7 @@ export = class Fishbowl {
     }
 
     if (this.waiting) {
-      this.reqQueue.push({ req, options, json, cb });
+      this.reqQueue.push({ req, options, json, rawFishbowlResponse, cb });
       return;
     }
 
@@ -209,7 +210,7 @@ export = class Fishbowl {
         this.logger.info('Not connected to server, connecting now...');
       }
 
-      this.reqQueue.push({ req, options, json, cb });
+      this.reqQueue.push({ req, options, json, rawFishbowlResponse, cb });
       this.connectToFishbowl(true);
       return;
     }
@@ -224,6 +225,15 @@ export = class Fishbowl {
           this.logger.error(err);
         }
 
+        return;
+      }
+
+      if (rawFishbowlResponse) {
+        if (cb !== undefined) {
+          cb(null, data);
+        }
+
+        this.deque();
         return;
       }
 
@@ -350,7 +360,7 @@ export = class Fishbowl {
     this.waiting = false;
     if (this.reqQueue.length > 0) {
       const queuedReq = this.reqQueue.shift();
-      this.sendRequest({ req: queuedReq.req, options: queuedReq.options, json: queuedReq.json }, queuedReq.cb);
+      this.sendRequest({ req: queuedReq.req, options: queuedReq.options, json: queuedReq.json, rawFishbowlResponse: queuedReq.rawFishbowlResponse }, queuedReq.cb);
     }
   };
 
