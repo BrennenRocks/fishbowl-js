@@ -529,9 +529,9 @@ export = class Fishbowl {
         FbiMsgsRq: {
           QuickShipRq: {
             SONumber: options.soNumber,
-            fulfillServiceItems: options.fulfillServiceItems,
-            errorIfNotFulfilled: options.errorIfNotFulfilled,
-            shipDate: options.shipDate
+            FulfillServiceItems: options.fulfillServiceItems,
+            ErrorIfNotFulfilled: options.errorIfNotFulfilled,
+            ShipDate: options.shipDate
           }
         }
       }
