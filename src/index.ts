@@ -229,6 +229,12 @@ export = class Fishbowl {
       }
 
       if (rawFishbowlResponse) {
+        if (Object.keys(data.FbiJson.FbiMsgsRs)[1] === 'LoginRs') {
+          this.loggedIn = true;
+          this.key = data.FbiJson.Ticket.Key;
+          this.userId = data.FbiJson.Ticket.UserID;
+        }
+        
         if (cb !== undefined) {
           cb(null, data);
         }
