@@ -234,7 +234,7 @@ export = class Fishbowl {
           this.key = data.FbiJson.Ticket.Key;
           this.userId = data.FbiJson.Ticket.UserID;
         }
-        
+
         if (cb !== undefined) {
           cb(null, data);
         }
