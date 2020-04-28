@@ -217,7 +217,9 @@ export = class Fishbowl {
 
     this.connection.once('done', (err, data) => {
       if (err && cb !== undefined) {
-        return cb(err, null);
+        cb(err, null);
+        this.deque();
+        return;
       }
 
       if (err) {
@@ -225,6 +227,7 @@ export = class Fishbowl {
           this.logger.error(err);
         }
 
+        this.deque();
         return;
       }
 
@@ -323,7 +326,18 @@ export = class Fishbowl {
       this.connected = false;
     });
 
-    this.connection.on('error', err => {
+    this.connection.on('error', (err: any) => {
+      if (err.code === 'ECONNREFUSED' || err.code === 'EALREADY' || err.code === 'ENOTFOUND') {
+        if (this.useLogger) {
+          this.logger.error(`${this.host}:${this.port} is not available to connect to.`);
+        }
+
+        this.connected = false;
+        this.loggedIn = false;
+        this.connection.destroy();
+        throw new Error(`${this.host}:${this.port} is not available to connect to.`);
+      }
+
       if (this.useLogger) {
         this.logger.error(`Unexpected error... Disconnected from server, attempting to reconnect. ${err}`);
       }
