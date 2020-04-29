@@ -81,8 +81,9 @@ export = class Fishbowl {
     IADescription = 'Fishbowljs helper',
     username = 'admin',
     password = 'admin',
-    useLogger = true
-  }: ConstructorOptions) {
+    useLogger = true,
+  }: ConstructorOptions, didError: (err: Error | null, res: any) => void
+  ) {
     this.host = host;
     this.port = port;
     this.IAID = IAID;
@@ -112,7 +113,7 @@ export = class Fishbowl {
       });
     }
 
-    this.connectToFishbowl(false);
+    this.connectToFishbowl(false, didError);
   }
 
   /**
@@ -211,7 +212,7 @@ export = class Fishbowl {
       }
 
       this.reqQueue.push({ req, options, json, rawFishbowlResponse, cb });
-      this.connectToFishbowl(true);
+      this.connectToFishbowl(true, cb);
       return;
     }
 
@@ -301,7 +302,7 @@ export = class Fishbowl {
   /**
    * Setup connection with Fishbowl
    */
-  private connectToFishbowl = (login: boolean): void => {
+  private connectToFishbowl = (login: boolean, didError?: (err: Error | null, res: any) => void): void => {
     let resLength: number | undefined;
     let resData: any;
 
@@ -335,7 +336,12 @@ export = class Fishbowl {
         this.connected = false;
         this.loggedIn = false;
         this.connection.destroy();
-        throw new Error(`${this.host}:${this.port} is not available to connect to.`);
+        if (didError) {
+          const err: Error = {code: 400, message: `${this.host}:${this.port} is not available to connect to.`};
+          didError(err, null);
+        }
+        
+        return;
       }
 
       if (this.useLogger) {
@@ -344,7 +350,10 @@ export = class Fishbowl {
 
       this.connected = false;
       this.loggedIn = false;
-      this.connectToFishbowl(true);
+      if (didError) {
+        didError(err, null);
+      }
+      this.connectToFishbowl(true, didError);
     });
 
     this.connection.on('data', data => {

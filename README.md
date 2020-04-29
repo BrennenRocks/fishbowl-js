@@ -28,6 +28,15 @@ const fb = new Fishbowl({
     useLogger: true
   });
 ```
+### Versions >= 2.6.0 now you may pass a callback function to the constructor to know if it connected properly
+```javascript
+const fb = new Fishbowl({}, (err, res) => {
+  if (err) {
+    console.log(err);
+    return;
+  }
+});
+```
 
 ### Versions >= 2.3.0 can now use async await with the sendRequestPromise({ req, options, json }) function
 
@@ -85,7 +94,12 @@ fb.sendRequest({ req: 'ExecuteQueryRq', options: { query: "select * from part wh
 ```javascript
 const Fishbowl = require('fishbowl-js');
 
-const fb = new Fishbowl({});
+const fb = new Fishbowl({}, (err, res) => {
+  if (err) {
+    console.log(err);
+    return;
+  }
+});
 
 // If you have already approved this integration, this will be seamless.
 // If you have not approved the integration, you will need to approve it and then send the login request again.
