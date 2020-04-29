@@ -337,8 +337,8 @@ export = class Fishbowl {
         this.loggedIn = false;
         this.connection.destroy();
         if (didError) {
-          const err: Error = {code: 400, message: `${this.host}:${this.port} is not available to connect to.`};
-          didError(err, null);
+          const notAvailable: Error = {code: 400, message: `${this.host}:${this.port} is not available to connect to.`};
+          didError(notAvailable, null);
         }
         
         return;
