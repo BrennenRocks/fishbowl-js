@@ -73,16 +73,9 @@ export = class Fishbowl {
    * @param username - Fishbowl username
    * @param password - Fishbowl password
    */
-  constructor({
-    host = '127.0.0.1',
-    port = 28192,
-    IAID = 54321,
-    IAName = 'Fishbowljs',
-    IADescription = 'Fishbowljs helper',
-    username = 'admin',
-    password = 'admin',
-    useLogger = true,
-  }: ConstructorOptions, didError: (err: Error | null, res: any) => void
+  constructor(
+    { host = '127.0.0.1', port = 28192, IAID = 54321, IAName = 'Fishbowljs', IADescription = 'Fishbowljs helper', username = 'admin', password = 'admin', useLogger = true }: ConstructorOptions,
+    didError: (err: Error | null, res: any) => void
   ) {
     this.host = host;
     this.port = port;
@@ -337,10 +330,10 @@ export = class Fishbowl {
         this.loggedIn = false;
         this.connection.destroy();
         if (didError) {
-          const notAvailable: Error = {code: 400, message: `${this.host}:${this.port} is not available to connect to.`};
+          const notAvailable: Error = { code: 400, message: `${this.host}:${this.port} is not available to connect to.` };
           didError(notAvailable, null);
         }
-        
+
         return;
       }
 
