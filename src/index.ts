@@ -392,12 +392,12 @@ export = class Fishbowl {
     });
   };
 
-  private parseExecuteQueryRqToJson = (s: any): any => {
-    if (!Array.isArray(s.FbiJson.FbiMsgsRs.ExecuteQueryRs.Rows.Row)) {
-      return s;
+  private parseExecuteQueryRqToJson = (fbData: any): any => {
+    if (!Array.isArray(fbData.FbiJson.FbiMsgsRs.ExecuteQueryRs.Rows.Row)) {
+      return fbData;
     }
 
-    const row = s.FbiJson.FbiMsgsRs.ExecuteQueryRs.Rows.Row;
+    const row = fbData.FbiJson.FbiMsgsRs.ExecuteQueryRs.Rows.Row;
 
     const rows = [];
     const header = csv.toArray(row[0]);
@@ -410,33 +410,33 @@ export = class Fishbowl {
       data = {};
     }
 
-    s.FbiJson.FbiMsgsRs.ExecuteQueryRs.Rows = rows;
-    return s;
+    fbData.FbiJson.FbiMsgsRs.ExecuteQueryRs.Rows = rows;
+    return fbData;
   };
 
-  private parseImportHeaderRqToJson = (s: any): any => {
+  private parseImportHeaderRqToJson = (fbData: any): any => {
     // TODO: Double header imports return an array of Rows and not just a String
-    let row = s.FbiJson.FbiMsgsRs.ImportHeaderRs.Header.Row;
+    let row = fbData.FbiJson.FbiMsgsRs.ImportHeaderRs.Header.Row;
     row = row.replace(/"/g, '');
 
-    const o: { [k: string]: any } = {};
+    const newRow: { [k: string]: any } = {};
     const keys = row.split(',');
-    keys.forEach((el: string) => (o[el] = ''));
+    keys.forEach((el: string) => (newRow[el] = ''));
 
-    s.FbiJson.FbiMsgsRs.ImportHeaderRs.Header.Row = o;
-    return s;
+    fbData.FbiJson.FbiMsgsRs.ImportHeaderRs.Header.Row = newRow;
+    return fbData;
   };
 
-  private parseJsonToCsv = (o: object[]): string[] => {
-    const row: string[] = [];
-    row.push(`${Object.keys(o[0])}`);
+  private parseJsonToCsv = (rows: object[]): string[] => {
+    const newRow: string[] = [];
+    newRow.push(`${Object.keys(rows[0])}`);
 
-    for (let el of o) {
-      el = Object.values(el).map(e => `"${e}"`);
-      row.push(`${Object.values(el)}`);
+    for (let row of rows) {
+      row = Object.values(row).map(el => `"${el}"`);
+      newRow.push(`${Object.values(row)}`);
     }
 
-    return row;
+    return newRow;
   };
 
   /*================================
