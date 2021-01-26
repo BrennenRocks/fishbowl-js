@@ -226,7 +226,7 @@ export = class Fishbowl {
       }
 
       if (rawFishbowlResponse) {
-        if (Object.keys(data.FbiJson.FbiMsgsRs)[1] === 'LoginRs') {
+        if (Object.keys(data.FbiJson.FbiMsgsRs)[0] === 'LoginRs') {
           this.loggedIn = true;
           this.key = data.FbiJson.Ticket.Key;
           this.userId = data.FbiJson.Ticket.UserID;
@@ -240,7 +240,7 @@ export = class Fishbowl {
         return;
       }
 
-      const fbData = Object.keys(data.FbiJson.FbiMsgsRs)[1];
+      const fbData = Object.keys(data.FbiJson.FbiMsgsRs)[0];
       if (data.FbiJson.FbiMsgsRs.statusCode !== 1000) {
         const fbError: Error = {
           code: data.FbiJson.FbiMsgsRs.statusCode,
