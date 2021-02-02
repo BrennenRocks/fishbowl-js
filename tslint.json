@@ -11,6 +11,7 @@
     ],
     "no-namespace": false,
     "no-require-imports": false,
-    "no-var-requires": false
+    "no-var-requires": false,
+    "no-string-literal": false
   }
 }

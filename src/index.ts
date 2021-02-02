@@ -226,7 +226,8 @@ export = class Fishbowl {
       }
 
       if (rawFishbowlResponse) {
-        if (Object.keys(data.FbiJson.FbiMsgsRs)[0] === 'LoginRs') {
+        // LoginRs will never be undefined if it is present
+        if (data.FbiJson.FbiMsgsRs['LoginRs'] !== undefined) {
           this.loggedIn = true;
           this.key = data.FbiJson.Ticket.Key;
           this.userId = data.FbiJson.Ticket.UserID;
@@ -419,7 +420,7 @@ export = class Fishbowl {
     let row = fbData.FbiJson.FbiMsgsRs.ImportHeaderRs.Header.Row;
     row = row.replace(/"/g, '');
 
-    const newRow: { [k: string]: any } = {};
+    const newRow: { [k: string]: any; } = {};
     const keys = row.split(',');
     keys.forEach((el: string) => (newRow[el] = ''));
 
