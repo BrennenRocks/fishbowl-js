@@ -420,7 +420,7 @@ export = class Fishbowl {
     let row = fbData.FbiJson.FbiMsgsRs.ImportHeaderRs.Header.Row;
     row = row.replace(/"/g, '');
 
-    const newRow: { [k: string]: any; } = {};
+    const newRow: { [k: string]: any } = {};
     const keys = row.split(',');
     keys.forEach((el: string) => (newRow[el] = ''));
 

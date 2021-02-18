@@ -1,6 +1,6 @@
 {
   "name": "fishbowl-js",
-  "version": "2.6.1",
+  "version": "2.6.2",
   "description": "A JavaScript wrapper for the Fishbowl API",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
