@@ -18,7 +18,7 @@ Feel free to [donate](https://paypal.me/brennenrocks) to support Fishbowl-js! Th
 
 Fishbowl <=20.11 use 2.6.0
 
-Fishbowl >=21.2 use 2.6.1
+Fishbowl >=21.2 use >=2.6.2
 
 ## Usage
 The default options for the constructor are 
