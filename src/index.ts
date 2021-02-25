@@ -1,10 +1,9 @@
 import crypto from 'crypto';
 import * as net from 'net';
 import winston from 'winston';
-const csv = require('jquery-csv');
-
 import errorCodes from './errorCodes.json';
 import { Types } from './requestTypes';
+const csv = require('jquery-csv');
 
 interface ConstructorOptions {
   host?: string;
@@ -241,7 +240,9 @@ export = class Fishbowl {
         return;
       }
 
-      const fbData = Object.keys(data.FbiJson.FbiMsgsRs).find(msg => msg != 'statusCode');
+      // There is always a statusCode and some sort of response object from Fishbowl.
+      // Don't worry about undefined
+      const fbData = Object.keys(data.FbiJson.FbiMsgsRs).find(key => key !== 'statusCode')!;
       if (data.FbiJson.FbiMsgsRs.statusCode !== 1000) {
         const fbError: Error = {
           code: data.FbiJson.FbiMsgsRs.statusCode,

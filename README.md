@@ -14,12 +14,6 @@ If you have questions regarding the actual Fishbowl API please visit [the Fishbo
 ## Donate
 Feel free to [donate](https://paypal.me/brennenrocks) to support Fishbowl-js! This project is Open Source and is not affiliated with Fishbowl Inventory.
 
-## Version Issues (will be fixed soon)
-
-Fishbowl <=20.11 use 2.6.0
-
-Fishbowl >=21.2 use >=2.6.2
-
 ## Usage
 The default options for the constructor are 
 ```javascript
@@ -34,7 +28,8 @@ const fb = new Fishbowl({
     useLogger: true
   });
 ```
-### Versions >= 2.6.0 now you may pass a callback function to the constructor to know if it connected properly
+
+You may pass a callback function to the constructor to know if it connected properly
 ```javascript
 const fb = new Fishbowl({}, (err, res) => {
   if (err) {
@@ -44,7 +39,7 @@ const fb = new Fishbowl({}, (err, res) => {
 });
 ```
 
-### Versions >= 2.3.0 can now use async await with the sendRequestPromise({ req, options, json }) function
+To use async await use the sendRequestPromise({ req, options, json }) function
 
 ```javascript
 const executeQuery = async () => {
