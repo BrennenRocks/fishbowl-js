@@ -241,7 +241,7 @@ export = class Fishbowl {
         return;
       }
 
-      const fbData = Object.keys(data.FbiJson.FbiMsgsRs)[0];
+      const fbData = Object.keys(data.FbiJson.FbiMsgsRs).find(msg => msg != 'statusCode');
       if (data.FbiJson.FbiMsgsRs.statusCode !== 1000) {
         const fbError: Error = {
           code: data.FbiJson.FbiMsgsRs.statusCode,
