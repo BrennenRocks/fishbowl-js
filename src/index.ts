@@ -109,6 +109,22 @@ export = class Fishbowl {
   }
 
   /**
+   * Re-establish a previous session, should there be a connection failure, etc.
+   *
+   * @param info {SessionInfo}
+   */
+  public setSessionInfo(info: SessionInfo): void {
+    this.loggedIn = info.loggedIn;
+    this.username = info.username;
+    this.key = info.key;
+    this.host = info.host;
+    this.port = info.port;
+    this.IAID = info.IAID;
+    this.IAName = info.IAName;
+    this.IADescription = info.IADescription;
+  }
+
+  /**
    * @returns {SessionInfo}
    */
   public getSessionInfo(): SessionInfo {
