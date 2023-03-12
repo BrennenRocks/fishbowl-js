@@ -13,6 +13,7 @@ interface ConstructorOptions {
   IADescription?: string;
   username?: string;
   password?: string;
+  hashPassword?: boolean;
   useLogger?: boolean;
 }
 
@@ -60,6 +61,7 @@ export = class Fishbowl {
   private password: string;
 
   private useLogger: boolean;
+  private hashPassword: boolean;
   private logger: any;
 
   /**
@@ -73,7 +75,7 @@ export = class Fishbowl {
    * @param password - Fishbowl password
    */
   constructor(
-    { host = '127.0.0.1', port = 28192, IAID = 54321, IAName = 'Fishbowljs', IADescription = 'Fishbowljs helper', username = 'admin', password = 'admin', useLogger = true }: ConstructorOptions,
+    { host = '127.0.0.1', port = 28192, IAID = 54321, IAName = 'Fishbowljs', IADescription = 'Fishbowljs helper', username = 'admin', password = 'admin', useLogger = true, hashPassword = true }: ConstructorOptions,
     didError: (err: Error | null, res: any) => void
   ) {
     this.host = host;
@@ -83,6 +85,7 @@ export = class Fishbowl {
     this.IADescription = IADescription;
     this.username = username;
     this.password = password;
+    this.hashPassword = hashPassword;
     this.connection = new net.Socket();
     this.errorCodes = errorCodes;
     this.useLogger = useLogger;
@@ -457,10 +460,7 @@ export = class Fishbowl {
             IAName: this.IAName,
             IADescription: this.IADescription,
             UserName: this.username,
-            UserPassword: crypto
-              .createHash('md5')
-              .update(this.password)
-              .digest('base64')
+            UserPassword: this.hashPassword ? crypto.createHash('md5').update(this.password).digest('base64') : this.password
           }
         }
       }
